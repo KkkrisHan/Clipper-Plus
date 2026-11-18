@@ -27,14 +27,13 @@ The Chrome extension and Windows engine are both needed for local transcription.
 
 ## Features
 
-| Feature | What it does |
+| Scenario | Description |
 | --- | --- |
-| Web clipping | Extract page content and metadata, apply templates, then save to Obsidian, copy, or download Markdown. |
-| Video with subtitles | Use subtitle text already extracted by the clipper when available; choose whether to force audio transcription. |
-| Video without subtitles | Download audio with yt-dlp, convert it with FFmpeg, and transcribe it locally with faster-whisper. |
-| Editable Markdown | Produce a note with video metadata and timestamped transcript lines, then edit it in the clipper. |
-| History | Reopen completed transcriptions from the local cache, search records, and manage them in Settings. |
-| Reading tools | Keep the upstream Reader, highlighter, templates, and optional Interpreter features. |
+| When visiting a video page | Extract subtitles, title, author, and other information |
+| When visiting a text-based webpage | Extract webpage content |
+| During first-time setup | Automatically install dependencies and complete basic configuration using `setup/run-setup.bat`, including migrating your Obsidian vault and save location |
+
+Content clipped from webpages can be saved to your Obsidian vault in Markdown format, with history support.
 
 
 ## Get started
