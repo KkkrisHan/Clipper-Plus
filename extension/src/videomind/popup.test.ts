@@ -53,6 +53,7 @@ beforeEach(async () => {
 					result: { markdown: '# Original\n\n[00:00:01] Spoken words.', title: 'A video' } };
 				data = { task_id: 'transcript' };
 			}
+			if (req.type === 'CANCEL_TASK' && current) current = { ...current, state: 'CANCELLED' };
 			return { id: req.id, status: req.type === 'START_TRANSCRIPTION' ? 'accepted' : 'ok', data };
 		} },
 	});
@@ -73,6 +74,67 @@ async function open(): Promise<void> {
 }
 
 describe('Video integration in the upstream popup', () => {
+	it('starts with note content hidden from first paint and saving disabled', () => {
+		expect(document.querySelector('.clipper')?.hasAttribute('inert')).toBe(true);
+		expect((document.getElementById('clip-btn') as HTMLButtonElement).disabled).toBe(true);
+		expect((document.getElementById('transcription-progress') as HTMLElement).hidden).toBe(true);
+	});
+
+	it('keeps the editor inert while an existing task is being resolved', async () => {
+		delayedStatusCall = 1;
+		const opening = open();
+		await vi.waitFor(() => expect(resolveDelayedStatus).not.toBeNull());
+		expect(document.querySelector('.clipper')?.hasAttribute('inert')).toBe(true);
+		expect((document.getElementById('clip-btn') as HTMLButtonElement).disabled).toBe(true);
+		current = { task_id: 'active', kind: 'transcription', source_url: activeUrl,
+			state: 'TRANSCRIBING', progress: 0.42, message: '', error: null, result: null };
+		resolveDelayedStatus!({ task: current });
+		await opening;
+		expect((document.getElementById('note-content-field') as HTMLTextAreaElement).hidden).toBe(true);
+		expect((document.getElementById('progress') as HTMLProgressElement).value).toBe(0.42);
+	});
+
+	it.each([['en', 'Cancel'], ['zh-CN', '取消']])('shows progress in the editor and restores content on cancellation (%s)', async (language, cancelLabel) => {
+		backendUiLanguage = language as 'en' | 'zh-CN';
+		current = { task_id: 'active', kind: 'transcription', source_url: activeUrl,
+			state: 'TRANSCRIBING', progress: 0.42, message: '', error: null, result: null };
+		await open();
+		const editor = document.getElementById('note-content-field') as HTMLTextAreaElement;
+		const progress = document.getElementById('progress') as HTMLProgressElement;
+		const cancel = document.getElementById('cancel') as HTMLButtonElement;
+		const save = document.getElementById('clip-btn') as HTMLButtonElement;
+		expect(editor.hidden).toBe(true);
+		expect(editor.value).toContain('Original description');
+		expect(document.getElementById('transcription-progress')?.parentElement?.id).toBe('note-content-container');
+		expect(progress.hidden).toBe(false);
+		expect(progress.value).toBe(0.42);
+		expect(save.disabled).toBe(true);
+		expect(cancel.hidden).toBe(false);
+		expect(cancel.textContent).toBe(cancelLabel);
+		expect(document.getElementById('status')?.textContent).toContain(language === 'zh-CN' ? '正在转录音频' : 'Transcribing audio');
+		expect(save.nextElementSibling).toBe(cancel);
+		expect(document.querySelectorAll('#progress, #cancel')).toHaveLength(2);
+		click('cancel');
+		await vi.waitFor(() => expect(editor.hidden).toBe(false));
+		expect(editor.value).toContain('Original description');
+		expect(progress.hidden).toBe(true);
+		expect(save.disabled).toBe(false);
+		expect(cancel.hidden).toBe(true);
+		expect(calls).toContain('CANCEL_TASK');
+	});
+
+	it('restores the editor and save button after a failed transcription', async () => {
+		current = { task_id: 'failed', kind: 'transcription', source_url: activeUrl,
+			state: 'TRANSCRIBING', progress: 0.5, message: '', error: null, result: null };
+		await open();
+		current = { ...current, state: 'FAILED', error: { code: 'TRANSCRIPTION_FAILED', message: 'Failed', retryable: false } };
+		await vi.waitFor(() => expect((document.getElementById('error') as HTMLElement).hidden).toBe(false), { timeout: 2000 });
+		expect((document.getElementById('note-content-field') as HTMLTextAreaElement).hidden).toBe(false);
+		expect((document.getElementById('clip-btn') as HTMLButtonElement).disabled).toBe(false);
+		expect((document.getElementById('cancel') as HTMLButtonElement).hidden).toBe(true);
+		expect((document.getElementById('error') as HTMLElement).hidden).toBe(false);
+	});
+
 	it('keeps the original controls and uses only compact video status controls', async () => {
 		await open();
 		await vi.waitFor(() => expect(document.getElementById('status')?.textContent).toContain('Completed'));
@@ -82,6 +144,9 @@ describe('Video integration in the upstream popup', () => {
 		expect(document.getElementById('vault-select')).not.toBeNull();
 		expect(document.getElementById('path-name-field')).not.toBeNull();
 		expect(document.getElementById('clip-btn')?.textContent).toBe('Save Markdown');
+		expect((document.getElementById('note-content-field') as HTMLTextAreaElement).hidden).toBe(false);
+		expect((document.getElementById('cancel') as HTMLButtonElement).hidden).toBe(true);
+		expect((document.getElementById('clip-btn') as HTMLButtonElement).disabled).toBe(false);
 		expect(document.getElementById('download-original')).toBeNull();
 		expect(document.querySelectorAll('#popup-header .popup-actions > *').length).toBe(5);
 	});
@@ -104,12 +169,13 @@ describe('Video integration in the upstream popup', () => {
 			originalExtractionCalls += 1;
 			return null;
 		});
-		// The UI integration is not awaited by core/popup.ts; it does not change
-		// or replace the original popup for a non-video page.
+		// No native request is needed for a non-video page.
 		expect(performance.now() - started).toBeLessThan(100);
 		await result;
 		expect(calls).toEqual([]);
 		expect(document.getElementById('videomind-controls')?.hasAttribute('hidden')).toBe(true);
+		expect((document.getElementById('note-content-field') as HTMLTextAreaElement).hidden).toBe(false);
+		expect((document.getElementById('transcription-progress') as HTMLElement).hidden).toBe(true);
 		expect(document.getElementById('download-original')).toBeNull();
 	});
 

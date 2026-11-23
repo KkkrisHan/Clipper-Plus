@@ -1,4 +1,70 @@
-/* Small video status controls embedded in the upstream popup layout. */
+/* Video progress replaces the visible note body while its value stays intact. */
+.clipper[inert] {
+	visibility: hidden;
+}
+
+#note-content-container {
+	#note-content-field[hidden],
+	#transcription-progress[hidden] {
+		display: none;
+	}
+
+	#transcription-progress {
+		width: 100%;
+		min-width: 0;
+		min-height: 0;
+		padding: var(--popup-padding);
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		gap: 1rem;
+		color: var(--text-muted);
+		font-size: var(--font-ui-small);
+
+		#status {
+			text-align: center;
+			overflow-wrap: anywhere;
+		}
+
+		#progress {
+			width: 100%;
+			height: 12px;
+			accent-color: var(--interactive-accent);
+		}
+	}
+}
+
+.action-buttons.transcribing {
+	gap: 0.625rem;
+
+	#clip-btn,
+	#cancel {
+		flex: 1 1 0;
+		min-width: 0;
+		width: 0;
+		height: var(--input-height);
+	}
+
+	#clip-btn:disabled,
+	#clip-btn:disabled:hover {
+		background-color: color-mix(in srgb, var(--interactive-accent) 50%, #554b6b);
+		color: var(--text-on-accent);
+		box-shadow: var(--input-shadow);
+		opacity: 1;
+	}
+
+	#cancel[hidden],
+	.menu-btn,
+	.share-btn {
+		display: none;
+	}
+}
+
+.action-buttons #cancel[hidden] {
+	display: none;
+}
+
+/* Error and confirmation keep their existing location and behavior. */
 #videomind-controls {
 	display: flex;
 	flex-wrap: wrap;
@@ -8,18 +74,13 @@
 	color: var(--text-muted);
 	font-size: var(--font-ui-small);
 
+	&:not(:has(#error:not([hidden]), #confirmation:not([hidden]))) {
+		display: none;
+	}
+
+	&[hidden],
 	[hidden] {
 		display: none !important;
-	}
-
-	#status {
-		flex: 1 1 auto;
-	}
-
-	#progress {
-		flex: 1 0 100%;
-		width: 100%;
-		accent-color: var(--interactive-accent);
 	}
 
 	#error {

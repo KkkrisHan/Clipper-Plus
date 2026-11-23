@@ -67,8 +67,11 @@ function showControls(): void {
 
 function updateControls(): void {
 	const active = !!task && !terminal(task);
+	element('transcription-progress').hidden = !active;
+	markdownField().hidden = active;
+	element('action-buttons').classList.toggle('transcribing', active);
 	const progress = element<HTMLProgressElement>('progress');
-	progress.hidden = !active || (task?.state !== 'DOWNLOADING' && task?.state !== 'TRANSCRIBING');
+	progress.hidden = !active;
 	progress.value = task?.progress || 0;
 	element('cancel').hidden = !active;
 	element<HTMLButtonElement>('cancel').disabled = false;
@@ -280,7 +283,10 @@ function attachVideoControls(): void {
 		try {
 			await request('CANCEL_TASK', { task_id: active.task_id });
 			await poll(generation, active.source_url, active.task_id);
-		} catch (error) { setError(error); }
+		} catch (error) {
+			element<HTMLButtonElement>('cancel').disabled = false;
+			setError(error);
+		}
 	});
 	window.addEventListener('pagehide', () => {
 		void flushEditedMarkdown().catch(() => undefined);

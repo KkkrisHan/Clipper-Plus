@@ -25,15 +25,26 @@ Clipper Plus 基于 [Obsidian Web Clipper](https://github.com/obsidianmd/obsidia
 
 本地转写需要同时安装 Chrome 扩展和 Windows 引擎。即使引擎暂时不可用，普通网页剪藏仍可使用。
 
+<table>
+  <tr>
+    <td valign="middle"><strong>剪藏无字幕视频：</strong></td>
+    <td><img src="assets/clipperplus-demo.gif" width="500" alt="Clipper Plus 剪藏无字幕视频并转写音频的演示"></td>
+  </tr>
+</table>
+
+*演示视频来源：[WikiLearn – Identifying potential partners](https://commons.wikimedia.org/wiki/File:WikiLearn_-_Partnership_Building_-_human_graded_-_2.6_-_Identifying_potential_partners.webm)，作者 Asaf (WMF)，采用 [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) 许可协议。此 GIF 是使用该视频进行 Clipper Plus 剪藏操作的录屏，经过画面裁剪和时长压缩，也按 CC BY-SA 4.0 许可分享。*
+
 ## 功能
 
-| 情况 | 说明 |
+| 功能 | 说明 |
 | --- | --- |
-| 当所在网页是视频网页时 | 提取字幕和标题，作者等信息 |
-| 当所在网页是文字网页时 | 提取网页内容 |
-| 第一次使用时 | 使用setup/run-setup.bat自动补全依赖并完成基本设置，同步你的obsidian的库和保存路径 |
+| 网页剪藏 | 提取正文与元数据、应用模板，再保存到 Obsidian、复制或下载 Markdown。 |
+| 视频字幕 | 网页已有字幕文本时直接使用，也可选择强制转写音频。 |
+| 本地转写 | 当视频无字幕时，用 yt-dlp 下载音频、FFmpeg 转换，并在本机运行 faster-whisper。 |
+| 可编辑的 Markdown | 生成含视频元数据和时间戳字幕的笔记，并在剪藏器中编辑。 |
+| 历史记录 | 从本地缓存重新打开已完成的转写，在设置页搜索和管理记录。 |
+| 阅读工具 | 保留上游的阅读模式、高亮、模板及可选的 Interpreter 功能。 |
 
-从网页剪藏下来的内容支持以markdown形式保存到你的obsidian里，并提供历史记录。
 
 ## 开始使用
 
@@ -48,7 +59,7 @@ Clipper Plus 基于 [Obsidian Web Clipper](https://github.com/obsidianmd/obsidia
 
 1. 从[最新 Release](https://github.com/callmepingping/Clipper-Plus/releases/latest) 下载 **dist.zip**，解压到一个固定目录。
 2. 打开 `chrome://extensions`，启用**开发者模式**，点击**加载已解压的扩展程序**，选择解压后的 `dist` 文件夹。复制 Chrome 显示的 32 位扩展 ID。
-3. 从同一 Release 页面下载 **Source code (zip)**，解压到一个固定目录。运行该源码目录中的 `setup/run-setup.bat`，根据指引设置。
+3. 从同一 Release 页面下载 **Source code (zip)**，解压到一个固定目录。运行该源码目录中的 `setup/run-setup.bat`，根据指引设置
 
 如果移动扩展导致 Chrome 分配了新的扩展 ID，重新运行 Setup 并输入新 ID。修复时也可在解压后的源码目录运行 `py -3 setup/main.py --install --extension-id 当前扩展ID`。
 

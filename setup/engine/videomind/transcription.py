@@ -27,6 +27,7 @@ from urllib.parse import urlsplit
 
 from .errors import AppError
 from .downloader import classify_download_error, yt_dlp_options
+from .transcript_segmentation import segment_transcript
 
 _diagnostic_log = logging.getLogger("videomind.transcription")
 
@@ -265,7 +266,10 @@ def _whisper_worker(audio, config, connection):
     try:
         configured_language = config.get("language", "auto")
         language = None if configured_language in {None, "", "auto"} else configured_language
-        segments, info = model.transcribe(audio, language=language, vad_filter=True)
+        # Word times let the local formatter give each sentence its real first-word
+        # timestamp, including when Whisper returns multiple sentences in one segment.
+        segments, info = model.transcribe(audio, language=language, vad_filter=True,
+                                          word_timestamps=True)
         output = []
         duration = max(float(getattr(info, "duration", 0) or 0), 1)
         last = -1
@@ -275,7 +279,18 @@ def _whisper_worker(audio, config, connection):
             if not (math.isfinite(start) and math.isfinite(end)):
                 continue
             if text:
-                output.append({"start": max(0, start), "end": max(0, start, end), "text": text})
+                item = {"start": max(0, start), "end": max(0, start, end), "text": text}
+                words = getattr(segment, "words", None)
+                if words:
+                    item["words"] = [
+                        {"start": max(0, float(word.start)),
+                         "end": max(0, float(word.end)),
+                         "text": str(word.word)}
+                        for word in words
+                        if math.isfinite(float(word.start)) and math.isfinite(float(word.end))
+                        and str(word.word)
+                    ]
+                output.append(item)
             percent = int(min(100, max(0, end) * 100 / duration))
             if percent != last:
                 last = percent
@@ -318,7 +333,7 @@ def format_markdown(metadata, segments):
     if metadata.get("markdown"):
         lines.extend(["## Original clipping", "", str(metadata["markdown"]), ""])
     lines.extend(["## Transcript", ""])
-    for segment in segments:
+    for segment in segment_transcript(segments):
         # Only source-provided speaker labels are accepted by this formatter.
         speaker = f"{segment['speaker']}: " if segment.get("speaker") else ""
         lines.extend([f"[{_timestamp(segment['start'])}] {speaker}{segment['text']}", ""])

@@ -7,7 +7,7 @@
 </p>
 
 <h1 align="center">Clipper Plus</h1>
-<p align="center"><strong>Clip web pages and turn any video speech into editable Markdown.</strong></p>
+<p align="center"><strong>Clip web pages and turn video speech into editable Markdown.</strong></p>
 <p align="center">
   <img src="https://img.shields.io/badge/Chrome-Manifest%20V3-7048E8?style=flat-square" alt="Chrome Manifest V3">
   <img src="https://img.shields.io/badge/Local%20engine-Windows%2010%2F11-7048E8?style=flat-square" alt="Windows 10 and 11 local engine">
@@ -25,15 +25,25 @@ Clipper Plus extends [Obsidian Web Clipper](https://github.com/obsidianmd/obsidi
 
 The Chrome extension and Windows engine are both needed for local transcription. Ordinary web clipping can still be used when the engine is unavailable.
 
+<table>
+  <tr>
+    <td valign="middle"><strong>Clipping videos without subtitles:</strong></td>
+    <td><img src="assets/clipperplus-demo.gif" width="500" alt="Clipper Plus transcribing a video without subtitles"></td>
+  </tr>
+</table>
+
+*Demo source: [WikiLearn – Identifying potential partners](https://commons.wikimedia.org/wiki/File:WikiLearn_-_Partnership_Building_-_human_graded_-_2.6_-_Identifying_potential_partners.webm) by Asaf (WMF), licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). This GIF is a cropped, condensed screen recording of Clipper Plus using that video and is also shared under CC BY-SA 4.0.*
+
 ## Features
 
-| Scenario | Description |
+| Feature | What it does |
 | --- | --- |
-| When visiting a video page | Extract subtitles, title, author, and other information |
-| When visiting a text-based webpage | Extract webpage content |
-| During first-time setup | Automatically install dependencies and complete basic configuration using `setup/run-setup.bat`, including migrating your Obsidian vault and save location |
-
-Content clipped from webpages can be saved to your Obsidian vault in Markdown format, with history support.
+| Web clipping | Extract page content and metadata, apply templates, then save to Obsidian, copy, or download Markdown. |
+| Video with subtitles | Use subtitle text already extracted by the clipper when available; choose whether to force audio transcription. |
+| Video without subtitles | Download audio with yt-dlp, convert it with FFmpeg, and transcribe it locally with faster-whisper. |
+| Editable Markdown | Produce a note with video metadata and timestamped transcript lines, then edit it in the clipper. |
+| History | Reopen completed transcriptions from the local cache, search records, and manage them in Settings. |
+| Reading tools | Keep the upstream Reader, highlighter, templates, and optional Interpreter features. |
 
 
 ## Get started

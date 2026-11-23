@@ -34,6 +34,8 @@ module.exports = (env, argv) => {
 	};
 
 	const outputDir = getOutputDir();
+	const outputPath = isProduction && !isFirefox && !isSafari && env.OUTPUT_DIR
+		? path.resolve(env.OUTPUT_DIR) : path.resolve(__dirname, outputDir);
 	const browserName = isFirefox ? 'firefox' : (isSafari ? 'safari' : 'chrome');
 
 	const mainConfig = {
@@ -53,7 +55,7 @@ module.exports = (env, argv) => {
 			'reader-script': './src/reader-script.ts'
 		},
 		output: {
-			path: path.resolve(__dirname, outputDir),
+			path: outputPath,
 			filename: '[name].js',
 			module: false,
 		},
@@ -165,7 +167,7 @@ module.exports = (env, argv) => {
 			{
 				apply: (compiler) => {
 					compiler.hooks.afterEmit.tap('RemoveDSStore', (compilation) => {
-						removeDSStore(path.resolve(__dirname, outputDir));
+						if (!env.OUTPUT_DIR) removeDSStore(outputPath);
 					});
 				}
 			},
@@ -173,7 +175,7 @@ module.exports = (env, argv) => {
 				'process.env.NODE_ENV': JSON.stringify(argv.mode),
 				'DEBUG_MODE': JSON.stringify(!isProduction)
 			}),
-			...(isProduction ? [
+			...(isProduction && !env.OUTPUT_DIR ? [
 				new ZipPlugin({
 					path: path.resolve(__dirname, 'builds'),
 					filename: `clipper-plus-${package.version}-${browserName}.zip`,

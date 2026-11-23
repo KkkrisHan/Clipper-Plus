@@ -192,7 +192,7 @@ class PipelineTests(unittest.TestCase):
         factory = Mock(return_value=model)
         with patch.dict("sys.modules", {"faster_whisper": types.SimpleNamespace(WhisperModel=factory)}):
             segments = module._whisper_worker("audio.mp3", {"model": "base", "device": "cpu", "compute_type": "int8"}, Mock())
-        model.transcribe.assert_called_once_with("audio.mp3", language=None, vad_filter=True)
+        model.transcribe.assert_called_once_with("audio.mp3", language=None, vad_filter=True, word_timestamps=True)
         self.assertEqual(segments, [{"start": 0, "end": 1, "text": "Real words"}])
 
     def test_whisper_transcription_language_is_separate_from_ui_language(self):
@@ -201,7 +201,7 @@ class PipelineTests(unittest.TestCase):
         factory = Mock(return_value=model)
         with patch.dict("sys.modules", {"faster_whisper": types.SimpleNamespace(WhisperModel=factory)}):
             module._whisper_worker("audio.mp3", {"language": "zh", "model": "base", "device": "cpu", "compute_type": "int8"}, Mock())
-        model.transcribe.assert_called_once_with("audio.mp3", language="zh", vad_filter=True)
+        model.transcribe.assert_called_once_with("audio.mp3", language="zh", vad_filter=True, word_timestamps=True)
 
     def test_video_markdown_keeps_unicode_and_special_symbols(self):
         markdown = module.format_markdown({"title": "中文 日本語 🌏", "url": "https://example.com/v",

@@ -284,7 +284,6 @@ function setupMessageListeners() {
 }
 
 document.addEventListener('DOMContentLoaded', async function() {
-	loadedSettings = await loadSettings();
 	if (isIframe) {
 		document.documentElement.classList.add('is-embedded');
 	}
@@ -292,6 +291,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 	const isSidePanel = document.documentElement.classList.contains('is-side-panel');
 
 	try {
+		loadedSettings = await loadSettings();
 		// Get the active tab via background script to handle Firefox compatibility
 		const response = await browser.runtime.sendMessage({ action: "getActiveTab" }) as { tabId?: number; error?: string };
 		if (!response || response.error || !response.tabId) {
@@ -361,9 +361,11 @@ document.addEventListener('DOMContentLoaded', async function() {
 		// Native Messaging or the local speech engine.
 		let firstExtraction: Promise<ContentResponse | null> | undefined;
 		const getFirstExtraction = () => firstExtraction ??= memoizedExtractPageContent(tab.id);
-		if (openBehavior === 'popup' && !isIframe && !isSidePanel) {
-			void initializeVideoPopupIfNeeded(tab.url, getFirstExtraction);
-		}
+		const videoInitialization = openBehavior === 'popup' && !isIframe && !isSidePanel
+			? initializeVideoPopupIfNeeded(tab.url, getFirstExtraction).catch(error => {
+				console.error('Error resolving video popup state:', error);
+			})
+			: Promise.resolve();
 
 		// Setup event listeners for popup buttons
 		const refreshButton = document.getElementById('refresh-pane');
@@ -383,6 +385,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 			const initialized = await initializeExtension(currentTabId);
 			if (!initialized) {
 				markOriginalPopupReady(false);
+				showError(getMessage('failedToInitialize'));
 				return;
 			}
 
@@ -409,6 +412,13 @@ document.addEventListener('DOMContentLoaded', async function() {
 					stage: 'T4_markdown_first_render', at_ms: Math.round(performance.timeOrigin + performance.now())
 				});
 				markOriginalPopupReady(extracted);
+				if (extracted) {
+					await videoInitialization;
+					const clipper = document.querySelector('.clipper');
+					clipper?.removeAttribute('inert');
+					const clipButton = document.getElementById('clip-btn') as HTMLButtonElement | null;
+					if (clipButton) clipButton.disabled = document.getElementById('action-buttons')?.classList.contains('transcribing') || false;
+				}
 			} catch (error) {
 				markOriginalPopupReady(false);
 				console.error('Error initializing popup:', error);
