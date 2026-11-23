@@ -23,16 +23,18 @@
 
 Clipper Plus extends [Obsidian Web Clipper](https://github.com/obsidianmd/obsidian-clipper) with an unsubtitled video transcription workflow. The familiar clipper handles ordinary web pages, templates, Reader, highlights, and saving to Obsidian or Markdown. On a video page, it can produce subtitle text extracted from the page whether the video contains subtitles or not.
 
-The Chrome extension and Windows engine are both needed for local transcription. Ordinary web clipping can still be used when the engine is unavailable.
+Local video transcription currently requires Windows, the Chrome extension, and the companion local engine. Standard web clipping works without the local engine.
 
 <table>
   <tr>
     <td valign="middle"><strong>Clipping videos without subtitles:</strong></td>
-    <td><img src="assets/clipperplus-demo.gif" width="500" alt="Clipper Plus transcribing a video without subtitles"></td>
+    <td><img src="assets/clipperplus-demo-full.gif" width="500" alt="Clipper Plus transcribing video audio into timestamped Markdown and correcting the transcript"></td>
   </tr>
 </table>
 
-*Demo source: [WikiLearn – Identifying potential partners](https://commons.wikimedia.org/wiki/File:WikiLearn_-_Partnership_Building_-_human_graded_-_2.6_-_Identifying_potential_partners.webm) by Asaf (WMF), licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). This GIF is a cropped, condensed screen recording of Clipper Plus using that video and is also shared under CC BY-SA 4.0.*
+From video to editable Markdown: transcribe video audio into timestamped Markdown, review the generated text, and correct transcription errors before saving to Obsidian.
+
+*Demo source: [WikiLearn – Identifying potential partners](https://commons.wikimedia.org/wiki/File:WikiLearn_-_Partnership_Building_-_human_graded_-_2.6_-_Identifying_potential_partners.webm) by Asaf (WMF), licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). This GIF combines cropped screen recordings of the transcription and editing workflows; the transcription segment is condensed. The GIF is also shared under CC BY-SA 4.0.*
 
 ## Features
 

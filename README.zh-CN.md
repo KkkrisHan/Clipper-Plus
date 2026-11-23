@@ -23,16 +23,18 @@
 
 Clipper Plus 基于 [Obsidian Web Clipper](https://github.com/obsidianmd/obsidian-clipper)，增加了对无字幕视频的剪藏功能。原有剪藏器负责普通网页、模板、阅读模式、高亮，以及保存到 Obsidian 或下载 Markdown。在视频页上，扩展可以使用从网页提取到的字幕文本，当视频无字幕时，独立的 Windows 引擎将自动用 faster-whisper 转写音频。
 
-本地转写需要同时安装 Chrome 扩展和 Windows 引擎。即使引擎暂时不可用，普通网页剪藏仍可使用。
+本地视频转录功能目前需要 Windows 系统、Chrome 扩展及配套的本地引擎。普通网页剪藏功能无需安装本地引擎。
 
 <table>
   <tr>
     <td valign="middle"><strong>剪藏无字幕视频：</strong></td>
-    <td><img src="assets/clipperplus-demo.gif" width="500" alt="Clipper Plus 剪藏无字幕视频并转写音频的演示"></td>
+    <td><img src="assets/clipperplus-demo-full.gif" width="500" alt="Clipper Plus 将视频语音转录为带时间戳的 Markdown 并手动修正文本的演示"></td>
   </tr>
 </table>
 
-*演示视频来源：[WikiLearn – Identifying potential partners](https://commons.wikimedia.org/wiki/File:WikiLearn_-_Partnership_Building_-_human_graded_-_2.6_-_Identifying_potential_partners.webm)，作者 Asaf (WMF)，采用 [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) 许可协议。此 GIF 是使用该视频进行 Clipper Plus 剪藏操作的录屏，经过画面裁剪和时长压缩，也按 CC BY-SA 4.0 许可分享。*
+从视频到可编辑的 Markdown：将视频语音转录为带时间戳的 Markdown，检查生成的文本、手动修正识别错误，再保存到 Obsidian。
+
+*演示视频来源：[WikiLearn – Identifying potential partners](https://commons.wikimedia.org/wiki/File:WikiLearn_-_Partnership_Building_-_human_graded_-_2.6_-_Identifying_potential_partners.webm)，作者 Asaf (WMF)，采用 [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) 许可协议。此 GIF 合并了经过画面裁剪的转录与编辑操作录屏，其中转录片段压缩了时长；GIF 同样按 CC BY-SA 4.0 许可分享。*
 
 ## 功能
 
